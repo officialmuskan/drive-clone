@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const streamifier = require("streamifier");
 const cloudinary = require("../cloudinary");
-const upload = require("../middlewares/multer");
+const upload = require("../middleware/multer");
 
 const fs = require('fs');
 const Image = require('../models/Image');
