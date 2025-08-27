@@ -1,6 +1,10 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const streamifier = require("streamifier");
+const cloudinary = require("../cloudinary");
+const upload = require("../middlewares/multer");
+
 const fs = require('fs');
 const Image = require('../models/Image');
 const Folder = require('../models/Folder');
@@ -9,19 +13,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
@@ -31,13 +23,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ 
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  }
-});
+
 
 // Upload image
 router.post('/upload', auth, upload.single('image'), async (req, res) => {
@@ -64,24 +50,37 @@ router.post('/upload', auth, upload.single('image'), async (req, res) => {
       }
     }
 
-    const image = new Image({
-      name,
-      originalName: req.file.originalname,
-      filename: req.file.filename,
-      path: req.file.path,
-      size: req.file.size,
-      folder: folderId || null,
-      owner: req.user._id
-    });
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "myapp_images" }, // optional cloudinary folder
+      async (error, result) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ message: "Cloudinary upload failed", error });
+        }
 
-    await image.save();
-    res.status(201).json(image);
+        // save reference in DB
+        const image = new Image({
+          name,
+          originalName: req.file.originalname,
+          url: result.secure_url,
+          publicId: result.public_id,
+          size: req.file.size,
+          folder: folderId || null,
+          owner: req.user._id,
+        });
+
+        await image.save();
+        res.status(201).json(image);
+      }
+    );
+
+    // stream buffer -> cloudinary
+    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+  
   } catch (error) {
     // Clean up uploaded file if database save fails
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-    res.status(500).json({ message: 'Server error', error: error.message });
+   res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
