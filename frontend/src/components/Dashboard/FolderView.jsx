@@ -19,10 +19,27 @@ const FolderView = () => {
     setFolderModal,
     handleFolderCreated,
   } = useFolderContext();
-
+    const[loading, setLoading] = useState(false);
+    const[images, setImages] = useState(images);
+    const[folders, setFolders] = useState(folders);
     const handleFolderClick = (folder) => {
       setCurrentFolder(folder._id);
     };
+    const loadFolderContents = async (folderId) => {
+    try {
+      setLoading(true);
+      const response = await folderAPI.getFolderContents(folderId);
+      setFolders(response.data.folders);
+      setImages(response.data.images);
+      
+    } catch (error) {
+      
+      console.error("Error loading folder contents:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   
     const handleBreadcrumbClick = (folderId) => {
       setCurrentFolder(folderId);
