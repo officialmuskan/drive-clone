@@ -10,11 +10,11 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",        // send API requests to Express
+      "src": "/api/(.*)",        
       "dest": "index.js"
     },
     {
-      "src": "/(.*)",            // send all other routes to React app
+      "src": "/(.*)",           
       "dest": "/dist/index.html"
     }
   ]
