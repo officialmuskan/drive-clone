@@ -21,7 +21,7 @@ export const FolderProvider = ({ children }) => {
     } else {
       setFolderPath([]);
     }
-  }, [currentFolder, images]);
+  }, [currentFolder]);
 
   const loadFolderContents = async (folderId) => {
     try {
