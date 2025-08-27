@@ -16,7 +16,7 @@ const FolderView = () => {
     currentFolder,
     setCurrentFolder,
     showFolderModal,
-    setFolderModal,
+    setFolderModal,handleImageUploaded,
     handleFolderCreated,
   } = useFolderContext();
  
@@ -38,9 +38,9 @@ const FolderView = () => {
         setCurrentFolder(null);
       }
     };
-  const handleImageUploaded = () => {
-    setImageModal(false);
-    loadFolderContents(currentFolder);
+   const onUploadSuccess = () => {
+    // after uploading image
+    handleImageUploaded();
   };
 
   const getImageUrl = (image) => {
@@ -147,7 +147,7 @@ const FolderView = () => {
         <ImageModal
           folderId={currentFolder}
           onClose={() => setImageModal(false)}
-          onImageUploaded={handleImageUploaded}
+          onImageUploaded={onUploadSuccess}
         />
       )}
     </div>
