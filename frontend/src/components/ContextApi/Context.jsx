@@ -37,7 +37,10 @@ export const FolderProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
+const handleImageUploaded = () => {
+  setImageModal(false);
+  loadFolderContents(currentFolder);
+};
   const loadFolderPath = async (folderId) => {
     try {
       const response = await folderAPI.getFolderPath(folderId);
@@ -69,6 +72,7 @@ export const FolderProvider = ({ children }) => {
         setImageModal,
         error,
         handleFolderCreated,
+        handleImageUploaded,
       }}
     >
       {children}
