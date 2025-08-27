@@ -24,7 +24,9 @@ connectDatabase()
 app.use('/api/auth', authRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/images', imageRoutes);
-
+app.get('/', async (req, res) => {
+  res.json("hello");
+});
 
 const port = 5000
 const server = app.listen(port, ()=>{
