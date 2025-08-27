@@ -19,9 +19,7 @@ const FolderView = () => {
     setFolderModal,
     handleFolderCreated,
   } = useFolderContext();
-    const[loading, setLoading] = useState(false);
-    const[images, setImages] = useState(images);
-    const[folders, setFolders] = useState(folders);
+ 
     const handleFolderClick = (folder) => {
       setCurrentFolder(folder._id);
     };
