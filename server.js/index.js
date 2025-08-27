@@ -13,7 +13,6 @@ dotenv.config()
 app.use(cors());
 app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // console.log(process.env.MONGO_URI)
 const connectDatabase = async ()=>{   
     await mongoose.connect(process.env.MONGO_URI)
